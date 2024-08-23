@@ -13,9 +13,21 @@ import {
 import { Input } from "@/components/ui/input";
 import Loader from "@/components/shared/Loader";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  useCreateUserAccount,
+  useSignInAccount,
+} from "@/lib/react-query/queriesAndMutations";
 
 const SignUpForm = () => {
-  const isLoading = false;
+  useEffect(() => {
+    document.title = "snapgram | create free account";
+  }, []);
+  const { toast } = useToast();
+  const { mutateAsync: createUserAccount, isPending: isCreatingAccount } =
+    useCreateUserAccount();
+  const { mutateAsync: signInAccount } = useSignInAccount();
   const form = useForm<z.infer<typeof signUpValidationSchema>>({
     resolver: zodResolver(signUpValidationSchema),
     defaultValues: {
@@ -26,8 +38,26 @@ const SignUpForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof signUpValidationSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof signUpValidationSchema>) {
+    try {
+      const newAccount = await createUserAccount(values);
+      if (!newAccount) {
+        toast({
+          title: "Signup Failed Please Try Again",
+        });
+        return;
+      }
+      const session = signInAccount(values.email, values.password);
+      if (!session) {
+        toast({
+          title: "Signup Failed please try again",
+        });
+        return;
+      }
+      console.log(newAccount);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -52,11 +82,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input
-                    className="shad-input"
-                    placeholder="shadcn"
-                    {...field}
-                  />
+                  <Input className="shad-input" placeholder="name" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -70,7 +96,7 @@ const SignUpForm = () => {
                 <FormControl>
                   <Input
                     className="shad-input"
-                    placeholder="shadcn"
+                    placeholder="username"
                     {...field}
                   />
                 </FormControl>
@@ -86,7 +112,7 @@ const SignUpForm = () => {
                 <FormControl>
                   <Input
                     className="shad-input"
-                    placeholder="shadcn"
+                    placeholder="email"
                     type="email"
                     {...field}
                   />
@@ -103,7 +129,7 @@ const SignUpForm = () => {
                 <FormControl>
                   <Input
                     className="shad-input"
-                    placeholder="shadcn"
+                    placeholder="password"
                     type="password"
                     {...field}
                   />
@@ -112,7 +138,7 @@ const SignUpForm = () => {
             )}
           />
           <Button type="submit" className="shad-button_primary">
-            {isLoading ? (
+            {isCreatingAccount ? (
               <div className="flex-center gap-2">
                 <Loader />
               </div>
