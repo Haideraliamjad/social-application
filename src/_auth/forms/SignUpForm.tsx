@@ -143,7 +143,7 @@ const SignUpForm = () => {
                 <Loader />
               </div>
             ) : (
-              "Submit"
+              "Sign up"
             )}
           </Button>
           <p className="text-sm-regular text-center text-light-2 center mt-2">
