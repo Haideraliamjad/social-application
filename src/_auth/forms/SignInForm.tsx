@@ -34,14 +34,14 @@ const SignInForm = () => {
 
   async function onSubmit(values: z.infer<typeof signInValidationSchema>) {
     try {
-      const { email, password } = values;
-      const session = signInAccount(email, password);
+      const session = signInAccount(values);
       if (!session) {
         toast({
           title: "Signin Failed please try again",
         });
         return;
       }
+      console.log("/session");
     } catch (error) {
       console.error(error);
     }

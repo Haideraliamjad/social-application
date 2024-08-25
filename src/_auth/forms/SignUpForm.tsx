@@ -12,18 +12,31 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Loader from "@/components/shared/Loader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   useCreateUserAccount,
   useSignInAccount,
 } from "@/lib/react-query/queriesAndMutations";
+import { useUserContext } from "@/context/authContext";
 
 const SignUpForm = () => {
+  const navigate = useNavigate();
+  const { checkAuthUser } = useUserContext();
+
   useEffect(() => {
     document.title = "snapgram | create free account";
+    async function isLoggedIn() {
+      const isLoggedIn = await checkAuthUser();
+      if (isLoggedIn) {
+        form.reset();
+        navigate("/");
+      }
+    }
+    isLoggedIn();
   }, []);
+
   const { toast } = useToast();
   const { mutateAsync: createUserAccount, isPending: isCreatingAccount } =
     useCreateUserAccount();
@@ -47,11 +60,13 @@ const SignUpForm = () => {
         });
         return;
       }
-      const session = signInAccount(values.email, values.password);
+      const { email, password } = values;
+      const session = signInAccount({ email, password });
       if (!session) {
         toast({
-          title: "Signup Failed please try again",
+          title: "Something went wrong please login to your new account",
         });
+        navigate("/sign-in");
         return;
       }
       console.log(newAccount);
