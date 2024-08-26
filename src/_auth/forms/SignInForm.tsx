@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Loader from "@/components/shared/Loader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useSignInAccount } from "@/lib/react-query/queriesAndMutations";
@@ -21,6 +21,7 @@ const SignInForm = () => {
   useEffect(() => {
     document.title = "snapgram | sign in to your account";
   }, []);
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { mutateAsync: signInAccount, isPending: isLoggingIn } =
     useSignInAccount();
@@ -34,14 +35,16 @@ const SignInForm = () => {
 
   async function onSubmit(values: z.infer<typeof signInValidationSchema>) {
     try {
-      const session = signInAccount(values);
+      const session = await signInAccount(values);
+      console.log(session);
       if (!session) {
         toast({
           title: "Signin Failed please try again",
         });
         return;
       }
-      console.log("/session");
+      console.log(session);
+      return navigate("/");
     } catch (error) {
       console.error(error);
     }
