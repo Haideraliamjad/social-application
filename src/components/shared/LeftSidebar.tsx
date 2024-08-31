@@ -3,16 +3,18 @@ import { INavLink } from "@/types";
 import { sidebarLinks } from "@/constants";
 import { useUserContext } from "../../context/authContext";
 import { Button } from "../ui/button";
+import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 
 const LeftSidebar = () => {
   const { pathname } = useLocation();
   const { user } = useUserContext();
   const navigate = useNavigate();
-
+  const { mutate: signOut } = useSignOutAccount();
   const handleSignOut = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
+    signOut();
     navigate("/sign-in");
   };
 
