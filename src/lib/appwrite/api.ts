@@ -174,3 +174,67 @@ export async function deleteFile(fileId: string) {
     console.log(error);
   }
 }
+
+export async function getRecentPosts() {
+  try {
+    const posts = await databases.listDocuments(
+      appWriteConfig.database,
+      appWriteConfig.postCollection,
+      [Query.orderDesc("$createdAt"), Query.limit(20)]
+    );
+    if (!posts) throw Error;
+    return posts;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function likePost(postId: string, likesArray: string[]) {
+  try {
+    const updatedPost = await databases.updateDocument(
+      appWriteConfig.database,
+      appWriteConfig.postCollection,
+      postId,
+      {
+        likes: likesArray,
+      }
+    );
+    if (!updatedPost) throw Error;
+    return updatedPost;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function savePost(postId: string, userId: string) {
+  try {
+    console.log("I am here");
+    const updatedPost = await databases.createDocument(
+      appWriteConfig.database,
+      appWriteConfig.saveCollection,
+      ID.unique(),
+      {
+        users: userId,
+        post: postId,
+      }
+    );
+    if (!updatedPost) throw Error;
+    return updatedPost;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function deleteSavedPost(saveRecordId: string) {
+  try {
+    const statusCode = await databases.deleteDocument(
+      appWriteConfig.database,
+      appWriteConfig.saveCollection,
+      saveRecordId
+    );
+    if (!statusCode) throw Error;
+    return statusCode;
+  } catch (error) {
+    console.error(error);
+  }
+}
