@@ -15,18 +15,27 @@ import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { postValidationSchema } from "@/lib/validation";
 import { Models } from "appwrite";
-import { useCreatePost } from "@/lib/react-query/queriesAndMutations";
+import {
+  useCreatePost,
+  useUpdatePost,
+} from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/authContext";
 import { useToast } from "../ui/use-toast";
 import Loader from "../shared/Loader";
+import { useNavigate } from "react-router-dom";
 
 type postFormProps = {
   post?: Models.Document;
+  action: "create" | "update";
 };
 
-const PostForm = ({ post }: postFormProps) => {
+const PostForm = ({ post, action }: postFormProps) => {
+  const navigate = useNavigate();
   const { mutateAsync: createPost, isPending: isLoadingCreate } =
     useCreatePost();
+  const { mutateAsync: updatePost, isPending: isLoadingUpdate } =
+    useUpdatePost();
+
   const { user } = useUserContext();
   const { toast } = useToast();
   const form = useForm<z.infer<typeof postValidationSchema>>({
@@ -40,6 +49,22 @@ const PostForm = ({ post }: postFormProps) => {
   });
 
   async function onSubmit(values: z.infer<typeof postValidationSchema>) {
+    if (post && action === "update") {
+      const isupdatePost = await updatePost({
+        ...values,
+        postId: post.$id,
+        imageId: post?.imageId,
+        imageUrl: post?.imageUrl,
+      });
+
+      if (!isupdatePost) {
+        toast({
+          title: "Something Went Wrong",
+        });
+      }
+      return navigate(`/posts/${post.$id}`);
+    }
+
     const newPost = await createPost({
       ...values,
       userId: user.id,
@@ -134,14 +159,21 @@ const PostForm = ({ post }: postFormProps) => {
         />
 
         <div className="flex gap-4 items-center justify-end">
-          <Button type="button" className="shad-button_dark_4">
-            Cancel
-          </Button>
           <Button
             type="submit"
             className="shad-button_primary whitespace-nowrap"
           >
-            {isLoadingCreate ? <Loader /> : "Submit"}
+            {action === "update" ? (
+              isLoadingUpdate ? (
+                <Loader />
+              ) : (
+                "Update"
+              )
+            ) : isLoadingCreate ? (
+              <Loader />
+            ) : (
+              "Submit"
+            )}
           </Button>
         </div>
       </form>
