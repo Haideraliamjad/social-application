@@ -17,6 +17,7 @@ import {
   getPostById,
   updatePost,
   deletePost,
+  getUserPosts,
 } from "../appwrite/api";
 import { INewUser, INewPost, IUpdatePost } from "@/types";
 import { QUERY_KEYS } from "./queryKeys";
@@ -180,5 +181,13 @@ export const useDeletePost = () => {
         queryKey: [QUERY_KEYS.GET_POST_BY_ID],
       });
     },
+  });
+};
+
+export const useGetUserPosts = (userId?: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_POSTS, userId],
+    queryFn: () => getUserPosts(userId),
+    enabled: !!userId,
   });
 };
