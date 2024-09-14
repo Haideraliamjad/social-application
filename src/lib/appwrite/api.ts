@@ -335,3 +335,36 @@ export async function getUserPosts(userId?: string) {
     console.log(error);
   }
 }
+
+export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
+  const quires: any[] = [Query.orderDesc("$updatedAt"), Query.limit(10)];
+
+  if (pageParam) {
+    quires.push(Query.cursorAfter(pageParam.toString()));
+  }
+  try {
+    const post = await databases.listDocuments(
+      appWriteConfig.database,
+      appWriteConfig.postCollection,
+      quires
+    );
+    if (!post) throw Error;
+    return post;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function searchPosts(searchTerm: string) {
+  try {
+    const post = await databases.listDocuments(
+      appWriteConfig.database,
+      appWriteConfig.postCollection,
+      [Query.search("caption", searchTerm)]
+    );
+    if (!post) throw Error;
+    return post;
+  } catch (error) {
+    console.error(error);
+  }
+}

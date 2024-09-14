@@ -1,5 +1,6 @@
 import {
   QueryClient,
+  useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
@@ -18,6 +19,8 @@ import {
   updatePost,
   deletePost,
   getUserPosts,
+  getInfinitePosts,
+  searchPosts,
 } from "../appwrite/api";
 import { INewUser, INewPost, IUpdatePost } from "@/types";
 import { QUERY_KEYS } from "./queryKeys";
@@ -189,5 +192,25 @@ export const useGetUserPosts = (userId?: string) => {
     queryKey: [QUERY_KEYS.GET_USER_POSTS, userId],
     queryFn: () => getUserPosts(userId),
     enabled: !!userId,
+  });
+};
+
+export const useGetPosts = () => {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
+    queryFn: getInfinitePosts,
+    getNextPageParam: (lastPage) => {
+      if (lastPage && lastPage.documents.length == 0) return null;
+      const lastId = lastPage?.documents[lastPage.documents.length - 1].$id;
+      return lastId;
+    },
+  });
+};
+
+export const useSearchPosts = (searchTearm: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SEARCH_POSTS],
+    queryFn: () => searchPosts(searchTearm),
+    enabled: !!searchTearm,
   });
 };
