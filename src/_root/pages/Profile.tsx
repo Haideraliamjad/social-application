@@ -116,7 +116,7 @@ const Profile = () => {
             />
             Posts
           </Link>
-          <Link
+          {/* <Link
             to={`/profile/${id}/liked-posts`}
             className={`profile-tab rounded-r-lg ${
               pathname === `/profile/${id}/liked-posts` && "!bg-dark-3"
@@ -129,7 +129,7 @@ const Profile = () => {
               height={20}
             />
             Liked Posts
-          </Link>
+          </Link> */}
         </div>
       )}
 
