@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import ProfileUploader from "@/components/shared/ProfileUploader";
 import Loader from "@/components/shared/Loader";
 import { ProfileValidation } from "@/lib/validation/index";
-import { useUserContext } from "@/context/AuthContext";
+import { useUserContext } from "@/context/authContext";
 import {
   useGetUserById,
   useUpdateUser,

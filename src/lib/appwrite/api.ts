@@ -32,7 +32,7 @@ export async function saveUserToDb(user: {
   accountId: string;
   name: string;
   email: string;
-  imageUrl: string | "";
+  imageUrl: string;
   username: string;
 }) {
   try {
@@ -145,6 +145,7 @@ export async function uploadFile(file: File) {
 }
 
 // ============================== GET FILE URL
+const ImageGravity: string = "top";
 export function getFilePreview(fileId: string) {
   try {
     const fileUrl = storage.getFilePreview(
@@ -152,7 +153,7 @@ export function getFilePreview(fileId: string) {
       fileId,
       2000,
       2000,
-      "top",
+      ImageGravity,
       100
     );
 
