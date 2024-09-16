@@ -1,6 +1,6 @@
 import { INewUser, INewPost, IUpdatePost, IUpdateUser } from "@/types";
 import { account, databases } from "./config";
-import { ID, Query } from "appwrite";
+import { ID, ImageGravity, Query } from "appwrite";
 import { avatar } from "./config";
 import { appWriteConfig, storage } from "./config";
 
@@ -32,7 +32,7 @@ export async function saveUserToDb(user: {
   accountId: string;
   name: string;
   email: string;
-  imageUrl: string;
+  imageUrl: URL;
   username: string;
 }) {
   try {
@@ -145,7 +145,7 @@ export async function uploadFile(file: File) {
 }
 
 // ============================== GET FILE URL
-const ImageGravity: string = "top";
+
 export function getFilePreview(fileId: string) {
   try {
     const fileUrl = storage.getFilePreview(
@@ -153,7 +153,7 @@ export function getFilePreview(fileId: string) {
       fileId,
       2000,
       2000,
-      ImageGravity,
+      "top" as ImageGravity,
       100
     );
 
@@ -338,7 +338,7 @@ export async function getUserPosts(userId?: string) {
 }
 
 export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
-  const quires: any[] = [Query.orderDesc("$updatedAt"), Query.limit(10)];
+  const quires = [Query.orderDesc("$updatedAt"), Query.limit(10)];
 
   if (pageParam) {
     quires.push(Query.cursorAfter(pageParam.toString()));
@@ -371,7 +371,7 @@ export async function searchPosts(searchTerm: string) {
 }
 
 export async function getUsers(limit?: number) {
-  const queries: any[] = [Query.orderDesc("$createdAt")];
+  const queries = [Query.orderDesc("$createdAt")];
   if (limit) {
     queries.push(Query.limit(limit));
   }
